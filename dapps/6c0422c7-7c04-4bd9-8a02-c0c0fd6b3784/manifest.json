@@ -1,0 +1,11 @@
+{
+  "id": "6c0422c7-7c04-4bd9-8a02-c0c0fd6b3784",
+  "name": "test-app",
+  "command": "node",
+  "args": [
+    "-e",
+    "\n  console.log('Test app started');\n  setInterval(() => {\n    console.log('Test app running...');\n  }, 5000);\n"
+  ],
+  "created": "2025-01-19T04:14:37.564Z",
+  "workDir": "dapps/6c0422c7-7c04-4bd9-8a02-c0c0fd6b3784"
+}

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Blockchain App Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <h1 class="text-4xl font-bold mb-4">🎮 Easy Blockchain App Creator</h1>
+        <p class="text-gray-600 mb-8">Create your own cryptocurrency or blockchain app without any technical knowledge!</p>
+        
+        <!-- Beginner's Guide -->
+        <div class="bg-blue-50 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">👋 New to Blockchain?</h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-medium">What is a Token? 🪙</h3>
+                    <p class="text-gray-600">Think of it like creating your own digital currency - similar to airline miles or game coins, but on the blockchain!</p>
+                </div>
+                <div>
+                    <h3 class="font-medium">What is Polygon? 🟣</h3>
+                    <p class="text-gray-600">Polygon is like a faster, cheaper version of other blockchain networks. It's perfect for beginners because transactions cost very little.</p>
+                </div>
+                <div>
+                    <h3 class="font-medium">What can I create? 🛠️</h3>
+                    <p class="text-gray-600">You can make your own cryptocurrency token that people can send to each other, just like Bitcoin or other digital currencies!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Token Form -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Create Your Token</h2>
+            <form id="createForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">What should we call your token?</label>
+                    <input type="text" name="name" required 
+                           placeholder="e.g., MyAwesomeCoin, FamilyToken, FriendPoints"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <p class="mt-1 text-sm text-gray-500">This will be the name of your cryptocurrency!</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">What do you want to do?</label>
+                    <select name="command" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="hardhat">Create a New Token</option>
+                    </select>
+                    <p class="mt-1 text-sm text-gray-500">For now, let's start with creating a basic token!</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Next Steps</label>
+                    <select name="args" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="compile">1. Check if your token code is correct</option>
+                        <option value="test">2. Test if your token works properly</option>
+                        <option value="run scripts/deploy.js --network polygon_mumbai">3. Make your token live on Polygon!</option>
+                    </select>
+                    <p class="mt-1 text-sm text-gray-500">Choose what you want to do with your token</p>
+                </div>
+
+                <div class="bg-yellow-50 p-4 rounded-md">
+                    <h3 class="font-medium text-yellow-800">Before making your token live:</h3>
+                    <ul class="mt-2 text-sm text-yellow-700 list-disc list-inside">
+                        <li>You'll need some test MATIC coins (like Monopoly money for blockchain)</li>
+                        <li>You'll need to set up a crypto wallet (like MetaMask)</li>
+                        <li>We'll help you with these steps when you're ready!</li>
+                    </ul>
+                </div>
+
+                <div id="errorMessage" class="hidden text-red-600 text-sm"></div>
+                
+                <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Create My Token! 🚀
+                </button>
+            </form>
+        </div>
+
+        <!-- Your Projects -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold mb-4">Your Projects</h2>
+            <div id="appsList" class="space-y-4">
+                <!-- Projects will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchApps() {
+            const response = await fetch('/api/apps');
+            const apps = await response.json();
+            
+            const appsList = document.getElementById('appsList');
+            if (apps.length === 0) {
+                appsList.innerHTML = '<p class="text-gray-500">No projects yet - create your first token above! 🎉</p>';
+                return;
+            }
+
+            appsList.innerHTML = apps.map(app => `
+                <div class="border rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-lg">${app.name}</h3>
+                            <p class="text-sm text-gray-600">Created: ${new Date(app.created).toLocaleString()}</p>
+                            <div class="mt-2">
+                                <span class="inline-block px-2 py-1 text-xs rounded-full ${
+                                    app.status === 'running' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }">
+                                    ${app.status === 'running' ? '▶️ Running' : '⏹️ Stopped'}
+                                </span>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-sm text-gray-600">
+                                    ${getActionDescription(app.command, app.args.join(' '))}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="space-x-2">
+                            <button onclick="stopApp('${app.id}')" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                                Pause ⏸️
+                            </button>
+                            <button onclick="removeApp('${app.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                Delete 🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getActionDescription(command, args) {
+            if (command === 'hardhat') {
+                if (args.includes('compile')) {
+                    return '🔍 Checking if your token code is correct...';
+                } else if (args.includes('test')) {
+                    return '🧪 Testing if your token works properly...';
+                } else if (args.includes('deploy')) {
+                    return '🚀 Getting ready to make your token live!';
+                }
+            }
+            return 'Working on your token...';
+        }
+
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                command: formData.get('command'),
+                args: [formData.get('args')]
+            };
+
+            const errorMessage = document.getElementById('errorMessage');
+            try {
+                const response = await fetch('/api/apps', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error);
+                }
+                
+                errorMessage.classList.add('hidden');
+                e.target.reset();
+                fetchApps();
+            } catch (err) {
+                errorMessage.textContent = "Oops! Something went wrong. Please try again!";
+                errorMessage.classList.remove('hidden');
+                console.error('Failed to create project:', err);
+            }
+        });
+
+        async function stopApp(id) {
+            try {
+                await fetch(`/api/apps/${id}/stop`, { method: 'POST' });
+                fetchApps();
+            } catch (err) {
+                console.error('Failed to stop project:', err);
+            }
+        }
+
+        async function removeApp(id) {
+            try {
+                await fetch(`/api/apps/${id}`, { method: 'DELETE' });
+                fetchApps();
+            } catch (err) {
+                console.error('Failed to remove project:', err);
+            }
+        }
+
+        fetchApps();
+        setInterval(fetchApps, 5000);
+    </script>
+</body>
+</html>
