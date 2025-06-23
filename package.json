@@ -13,5 +13,23 @@
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@openzeppelin/contracts": "^5.0.1",
     "dotenv": "^16.3.1"
-  }
+  },
+  "author": "Joe - XMRT",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevGruGold/web3bootstrap.git"
+  },
+  "keywords": [
+    "blockchain",
+    "cryptocurrency",
+    "privacy",
+    "defi",
+    "financial-freedom",
+    "liberty",
+    "web3",
+    "decentralized",
+    "crypto",
+    "privacy-tech"
+  ]
 }
